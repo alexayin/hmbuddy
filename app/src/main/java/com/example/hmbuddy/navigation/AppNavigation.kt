@@ -7,8 +7,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.hmbuddy.ui.screens.HomeScreen
 import com.example.hmbuddy.ui.screens.LogRunScreen
+import com.example.hmbuddy.ui.screens.ProfileScreen
 import com.example.hmbuddy.ui.screens.RunHistoryScreen
 import com.example.hmbuddy.ui.screens.WeeklyTargetsScreen
+import com.example.hmbuddy.viewmodel.ProfileViewModel
 import com.example.hmbuddy.viewmodel.RunViewModel
 import com.example.hmbuddy.viewmodel.TargetViewModel
 
@@ -17,6 +19,7 @@ sealed class Screen(val route: String) {
     object LogRun : Screen("log_run")
     object RunHistory : Screen("run_history")
     object WeeklyTargets : Screen("weekly_targets")
+    object Profile : Screen("profile")
 }
 
 @Composable
@@ -24,6 +27,7 @@ fun AppNavigation(
     navController: NavHostController,
     runViewModel: RunViewModel,
     targetViewModel: TargetViewModel,
+    profileViewModel: ProfileViewModel,
     modifier: Modifier = Modifier
 ) {
     NavHost(
@@ -35,9 +39,11 @@ fun AppNavigation(
             HomeScreen(
                 runViewModel = runViewModel,
                 targetViewModel = targetViewModel,
+                profileViewModel = profileViewModel,
                 onLogRunClick = { navController.navigate(Screen.LogRun.route) },
                 onRunHistoryClick = { navController.navigate(Screen.RunHistory.route) },
-                onWeeklyTargetsClick = { navController.navigate(Screen.WeeklyTargets.route) }
+                onWeeklyTargetsClick = { navController.navigate(Screen.WeeklyTargets.route) },
+                onProfileClick = { navController.navigate(Screen.Profile.route) }
             )
         }
 
@@ -56,6 +62,13 @@ fun AppNavigation(
             WeeklyTargetsScreen(
                 targetViewModel = targetViewModel,
                 onTargetsSaved = { navController.popBackStack() }
+            )
+        }
+
+        composable(Screen.Profile.route) {
+            ProfileScreen(
+                profileViewModel = profileViewModel,
+                onProfileSaved = { navController.popBackStack() }
             )
         }
     }

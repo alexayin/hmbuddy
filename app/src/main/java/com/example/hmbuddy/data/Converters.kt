@@ -12,4 +12,14 @@ class Converters {
     fun toRunType(value: String): RunType {
         return RunType.valueOf(value)
     }
+
+    @TypeConverter
+    fun fromGender(value: Gender): String {
+        return value.name
+    }
+
+    @TypeConverter
+    fun toGender(value: String): Gender {
+        return Gender.valueOf(value)
+    }
 }

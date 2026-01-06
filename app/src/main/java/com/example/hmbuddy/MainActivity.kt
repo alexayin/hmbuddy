@@ -23,6 +23,7 @@ import com.example.hmbuddy.data.AppDatabase
 import com.example.hmbuddy.navigation.AppNavigation
 import com.example.hmbuddy.navigation.Screen
 import com.example.hmbuddy.ui.theme.AndroidTestTheme
+import com.example.hmbuddy.viewmodel.ProfileViewModel
 import com.example.hmbuddy.viewmodel.RunViewModel
 import com.example.hmbuddy.viewmodel.TargetViewModel
 
@@ -34,6 +35,7 @@ class MainActivity : ComponentActivity() {
         val database = AppDatabase.getDatabase(this)
         val runDao = database.runDao()
         val weeklyTargetDao = database.weeklyTargetDao()
+        val userProfileDao = database.userProfileDao()
 
         enableEdgeToEdge()
         setContent {
@@ -48,6 +50,9 @@ class MainActivity : ComponentActivity() {
                 val targetViewModel: TargetViewModel = viewModel(
                     factory = TargetViewModel.Factory(weeklyTargetDao)
                 )
+                val profileViewModel: ProfileViewModel = viewModel(
+                    factory = ProfileViewModel.Factory(userProfileDao)
+                )
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
@@ -60,6 +65,7 @@ class MainActivity : ComponentActivity() {
                                             Screen.LogRun.route -> "Log Run"
                                             Screen.RunHistory.route -> "Run History"
                                             Screen.WeeklyTargets.route -> "Weekly Targets"
+                                            Screen.Profile.route -> "Profile"
                                             else -> ""
                                         }
                                     )
@@ -80,6 +86,7 @@ class MainActivity : ComponentActivity() {
                         navController = navController,
                         runViewModel = runViewModel,
                         targetViewModel = targetViewModel,
+                        profileViewModel = profileViewModel,
                         modifier = Modifier.padding(innerPadding)
                     )
                 }

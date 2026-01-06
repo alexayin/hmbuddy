@@ -1,6 +1,7 @@
 package com.example.hmbuddy.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -54,6 +55,7 @@ import com.example.hmbuddy.ui.theme.OrangeAccent
 import com.example.hmbuddy.ui.theme.TargetsPurple
 import com.example.hmbuddy.ui.theme.Teal500
 import com.example.hmbuddy.ui.theme.Teal600
+import com.example.hmbuddy.viewmodel.ProfileViewModel
 import com.example.hmbuddy.viewmodel.RunViewModel
 import com.example.hmbuddy.viewmodel.TargetViewModel
 
@@ -61,13 +63,16 @@ import com.example.hmbuddy.viewmodel.TargetViewModel
 fun HomeScreen(
     runViewModel: RunViewModel,
     targetViewModel: TargetViewModel,
+    profileViewModel: ProfileViewModel,
     onLogRunClick: () -> Unit,
     onRunHistoryClick: () -> Unit,
     onWeeklyTargetsClick: () -> Unit,
+    onProfileClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val weeklyTarget by targetViewModel.weeklyTarget.collectAsState()
     val runsThisWeek by runViewModel.runsThisWeek.collectAsState()
+    val userProfile by profileViewModel.userProfile.collectAsState()
 
     Column(
         modifier = modifier
@@ -84,7 +89,7 @@ fun HomeScreen(
         ) {
             Column {
                 Text(
-                    text = "Hey Alex",
+                    text = "Hey ${userProfile?.name ?: "Runner"}",
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
@@ -97,11 +102,12 @@ fun HomeScreen(
                 )
             }
 
-            // Profile icon with gradient
+            // Profile icon with gradient - clickable
             GradientIcon(
                 icon = Icons.AutoMirrored.Filled.DirectionsRun,
                 gradientColors = listOf(Teal500, Teal600),
-                size = 56
+                size = 56,
+                onClick = onProfileClick
             )
         }
 
@@ -216,7 +222,8 @@ fun HomeScreen(
 private fun GradientIcon(
     icon: ImageVector,
     gradientColors: List<Color>,
-    size: Int
+    size: Int,
+    onClick: () -> Unit = {}
 ) {
     Box(
         modifier = Modifier
@@ -224,12 +231,13 @@ private fun GradientIcon(
             .clip(CircleShape)
             .background(
                 brush = Brush.linearGradient(gradientColors)
-            ),
+            )
+            .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
         Icon(
             imageVector = icon,
-            contentDescription = null,
+            contentDescription = "Profile",
             modifier = Modifier.size((size * 0.5).dp),
             tint = Color.White
         )
