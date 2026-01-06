@@ -60,7 +60,7 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 @Composable
-fun AndroidTestTheme(
+fun HmBuddyTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {

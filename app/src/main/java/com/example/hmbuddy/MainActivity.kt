@@ -22,7 +22,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.hmbuddy.data.AppDatabase
 import com.example.hmbuddy.navigation.AppNavigation
 import com.example.hmbuddy.navigation.Screen
-import com.example.hmbuddy.ui.theme.AndroidTestTheme
+import com.example.hmbuddy.ui.theme.HmBuddyTheme
 import com.example.hmbuddy.viewmodel.ProfileViewModel
 import com.example.hmbuddy.viewmodel.RunViewModel
 import com.example.hmbuddy.viewmodel.TargetViewModel
@@ -41,7 +41,7 @@ class MainActivity : ComponentActivity() {
 
         enableEdgeToEdge()
         setContent {
-            AndroidTestTheme {
+            HmBuddyTheme {
                 val navController = rememberNavController()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
