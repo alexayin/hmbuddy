@@ -58,12 +58,14 @@ import com.example.hmbuddy.ui.theme.Teal600
 import com.example.hmbuddy.viewmodel.ProfileViewModel
 import com.example.hmbuddy.viewmodel.RunViewModel
 import com.example.hmbuddy.viewmodel.TargetViewModel
+import com.example.hmbuddy.viewmodel.WeeklyAchievementViewModel
 
 @Composable
 fun HomeScreen(
     runViewModel: RunViewModel,
     targetViewModel: TargetViewModel,
     profileViewModel: ProfileViewModel,
+    achievementViewModel: WeeklyAchievementViewModel,
     onLogRunClick: () -> Unit,
     onRunHistoryClick: () -> Unit,
     onWeeklyTargetsClick: () -> Unit,
@@ -73,6 +75,7 @@ fun HomeScreen(
     val weeklyTarget by targetViewModel.weeklyTarget.collectAsState()
     val runsThisWeek by runViewModel.runsThisWeek.collectAsState()
     val userProfile by profileViewModel.userProfile.collectAsState()
+    val currentStreak by achievementViewModel.currentStreak.collectAsState()
 
     Column(
         modifier = modifier
@@ -154,6 +157,11 @@ fun HomeScreen(
             weeklyTarget = weeklyTarget,
             totalMinutesThisWeek = runsThisWeek.sumOf { it.durationMinutes }
         )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Streak Card
+        StreakCard(streakCount = currentStreak)
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -331,6 +339,65 @@ private fun WeeklyProgressCard(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun StreakCard(streakCount: Int) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(
+                            if (streakCount > 0) Orange500.copy(alpha = 0.1f)
+                            else MaterialTheme.colorScheme.surfaceVariant
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = if (streakCount > 0) "\uD83D\uDD25" else "\u2B50",
+                        fontSize = 20.sp
+                    )
+                }
+                Spacer(modifier = Modifier.width(12.dp))
+                Column {
+                    Text(
+                        text = "Week Streak",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = if (streakCount > 0) "$streakCount consecutive weeks" else "Start your streak!",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            Text(
+                text = "$streakCount",
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold,
+                color = if (streakCount > 0) Orange500 else MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }

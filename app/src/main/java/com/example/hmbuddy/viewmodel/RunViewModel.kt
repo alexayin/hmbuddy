@@ -6,12 +6,12 @@ import androidx.lifecycle.viewModelScope
 import com.example.hmbuddy.data.RunDao
 import com.example.hmbuddy.data.RunLog
 import com.example.hmbuddy.data.RunType
+import com.example.hmbuddy.util.DateUtils
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.util.Calendar
 
 class RunViewModel(private val runDao: RunDao) : ViewModel() {
 
@@ -59,13 +59,7 @@ class RunViewModel(private val runDao: RunDao) : ViewModel() {
     }
 
     private fun getStartOfWeekTimestamp(): Long {
-        val calendar = Calendar.getInstance()
-        calendar.set(Calendar.DAY_OF_WEEK, calendar.firstDayOfWeek)
-        calendar.set(Calendar.HOUR_OF_DAY, 0)
-        calendar.set(Calendar.MINUTE, 0)
-        calendar.set(Calendar.SECOND, 0)
-        calendar.set(Calendar.MILLISECOND, 0)
-        return calendar.timeInMillis
+        return DateUtils.getStartOfWeekTimestamp()
     }
 
     class Factory(private val runDao: RunDao) : ViewModelProvider.Factory {

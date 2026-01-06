@@ -23,4 +23,7 @@ interface RunDao {
 
     @Delete
     suspend fun deleteRun(run: RunLog)
+
+    @Query("SELECT COALESCE(SUM(durationMinutes), 0) FROM run_logs WHERE date >= :weekStart AND date < :weekEnd")
+    suspend fun getTotalMinutesForWeek(weekStart: Long, weekEnd: Long): Int
 }

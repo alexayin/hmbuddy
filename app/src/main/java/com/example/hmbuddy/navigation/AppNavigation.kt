@@ -13,6 +13,7 @@ import com.example.hmbuddy.ui.screens.WeeklyTargetsScreen
 import com.example.hmbuddy.viewmodel.ProfileViewModel
 import com.example.hmbuddy.viewmodel.RunViewModel
 import com.example.hmbuddy.viewmodel.TargetViewModel
+import com.example.hmbuddy.viewmodel.WeeklyAchievementViewModel
 
 sealed class Screen(val route: String) {
     object Home : Screen("home")
@@ -28,6 +29,7 @@ fun AppNavigation(
     runViewModel: RunViewModel,
     targetViewModel: TargetViewModel,
     profileViewModel: ProfileViewModel,
+    achievementViewModel: WeeklyAchievementViewModel,
     modifier: Modifier = Modifier
 ) {
     NavHost(
@@ -40,6 +42,7 @@ fun AppNavigation(
                 runViewModel = runViewModel,
                 targetViewModel = targetViewModel,
                 profileViewModel = profileViewModel,
+                achievementViewModel = achievementViewModel,
                 onLogRunClick = { navController.navigate(Screen.LogRun.route) },
                 onRunHistoryClick = { navController.navigate(Screen.RunHistory.route) },
                 onWeeklyTargetsClick = { navController.navigate(Screen.WeeklyTargets.route) },

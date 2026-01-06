@@ -26,6 +26,7 @@ import com.example.hmbuddy.ui.theme.AndroidTestTheme
 import com.example.hmbuddy.viewmodel.ProfileViewModel
 import com.example.hmbuddy.viewmodel.RunViewModel
 import com.example.hmbuddy.viewmodel.TargetViewModel
+import com.example.hmbuddy.viewmodel.WeeklyAchievementViewModel
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -36,6 +37,7 @@ class MainActivity : ComponentActivity() {
         val runDao = database.runDao()
         val weeklyTargetDao = database.weeklyTargetDao()
         val userProfileDao = database.userProfileDao()
+        val weeklyAchievementDao = database.weeklyAchievementDao()
 
         enableEdgeToEdge()
         setContent {
@@ -52,6 +54,13 @@ class MainActivity : ComponentActivity() {
                 )
                 val profileViewModel: ProfileViewModel = viewModel(
                     factory = ProfileViewModel.Factory(userProfileDao)
+                )
+                val achievementViewModel: WeeklyAchievementViewModel = viewModel(
+                    factory = WeeklyAchievementViewModel.Factory(
+                        weeklyAchievementDao,
+                        runDao,
+                        weeklyTargetDao
+                    )
                 )
 
                 Scaffold(
@@ -87,6 +96,7 @@ class MainActivity : ComponentActivity() {
                         runViewModel = runViewModel,
                         targetViewModel = targetViewModel,
                         profileViewModel = profileViewModel,
+                        achievementViewModel = achievementViewModel,
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
