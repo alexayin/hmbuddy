@@ -4,15 +4,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.hmbuddy.data.WeeklyTarget
-import com.example.hmbuddy.data.WeeklyTargetDao
+import com.example.hmbuddy.data.repository.WeeklyTargetRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class TargetViewModel(private val weeklyTargetDao: WeeklyTargetDao) : ViewModel() {
+class TargetViewModel(private val repository: WeeklyTargetRepository) : ViewModel() {
 
-    val weeklyTarget: StateFlow<WeeklyTarget?> = weeklyTargetDao.getWeeklyTarget()
+    val weeklyTarget: StateFlow<WeeklyTarget?> = repository.getWeeklyTarget()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     fun saveWeeklyTarget(
@@ -26,15 +26,15 @@ class TargetViewModel(private val weeklyTargetDao: WeeklyTargetDao) : ViewModel(
                 tempoPaceSecondsPerKm = tempoPaceSecondsPerKm,
                 weeklyDurationMinutes = weeklyDurationMinutes
             )
-            weeklyTargetDao.saveWeeklyTarget(target)
+            repository.saveWeeklyTarget(target)
         }
     }
 
-    class Factory(private val weeklyTargetDao: WeeklyTargetDao) : ViewModelProvider.Factory {
+    class Factory(private val repository: WeeklyTargetRepository) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(TargetViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
-                return TargetViewModel(weeklyTargetDao) as T
+                return TargetViewModel(repository) as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")
         }

@@ -3,10 +3,8 @@ package com.example.hmbuddy.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.hmbuddy.data.RunDao
 import com.example.hmbuddy.data.WeeklyAchievement
-import com.example.hmbuddy.data.WeeklyAchievementDao
-import com.example.hmbuddy.data.WeeklyTargetDao
+import com.example.hmbuddy.data.repository.WeeklyAchievementRepository
 import com.example.hmbuddy.util.DateUtils
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,9 +13,7 @@ import kotlinx.coroutines.launch
 import java.util.Calendar
 
 class WeeklyAchievementViewModel(
-    private val achievementDao: WeeklyAchievementDao,
-    private val runDao: RunDao,
-    private val targetDao: WeeklyTargetDao
+    private val repository: WeeklyAchievementRepository
 ) : ViewModel() {
 
     private val _currentStreak = MutableStateFlow(0)
@@ -33,7 +29,7 @@ class WeeklyAchievementViewModel(
 
     private fun loadAchievements() {
         viewModelScope.launch {
-            achievementDao.getAllAchievements().collect { achievementList ->
+            repository.getAllAchievements().collect { achievementList ->
                 _achievements.value = achievementList
                 _currentStreak.value = calculateStreak(achievementList)
             }
@@ -46,14 +42,14 @@ class WeeklyAchievementViewModel(
             val previousWeekStart = DateUtils.getStartOfPreviousWeekTimestamp()
             val previousWeekEnd = currentWeekStart
 
-            val existingRecord = achievementDao.getAchievementForWeek(previousWeekStart)
+            val existingRecord = repository.getAchievementForWeek(previousWeekStart)
             if (existingRecord != null) {
                 return@launch
             }
 
-            val weeklyTarget = targetDao.getWeeklyTarget().first() ?: return@launch
+            val weeklyTarget = repository.getWeeklyTarget().first() ?: return@launch
 
-            val totalMinutes = runDao.getTotalMinutesForWeek(previousWeekStart, previousWeekEnd)
+            val totalMinutes = repository.getTotalMinutesForWeek(previousWeekStart, previousWeekEnd)
 
             if (totalMinutes > 0 || weeklyTarget.weeklyDurationMinutes > 0) {
                 val achievement = WeeklyAchievement(
@@ -62,7 +58,7 @@ class WeeklyAchievementViewModel(
                     actualMinutes = totalMinutes,
                     goalAchieved = totalMinutes >= weeklyTarget.weeklyDurationMinutes
                 )
-                achievementDao.saveAchievement(achievement)
+                repository.saveAchievement(achievement)
             }
         }
     }
@@ -93,14 +89,12 @@ class WeeklyAchievementViewModel(
     }
 
     class Factory(
-        private val achievementDao: WeeklyAchievementDao,
-        private val runDao: RunDao,
-        private val targetDao: WeeklyTargetDao
+        private val repository: WeeklyAchievementRepository
     ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(WeeklyAchievementViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
-                return WeeklyAchievementViewModel(achievementDao, runDao, targetDao) as T
+                return WeeklyAchievementViewModel(repository) as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")
         }

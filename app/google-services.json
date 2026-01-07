@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "669871043148",
+    "project_id": "hmbuddy-fd5e7",
+    "storage_bucket": "hmbuddy-fd5e7.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:669871043148:android:1b85d2c7ab5fe652807ae9",
+        "android_client_info": {
+          "package_name": "com.example.hmbuddy"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAbSGR2P2qZOOVpd7uIAQkZvdSYin2IpZI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

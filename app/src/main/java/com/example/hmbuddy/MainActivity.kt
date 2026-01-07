@@ -19,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.hmbuddy.data.AppDatabase
 import com.example.hmbuddy.navigation.AppNavigation
 import com.example.hmbuddy.navigation.Screen
 import com.example.hmbuddy.ui.theme.HmBuddyTheme
@@ -33,11 +32,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val database = AppDatabase.getDatabase(this)
-        val runDao = database.runDao()
-        val weeklyTargetDao = database.weeklyTargetDao()
-        val userProfileDao = database.userProfileDao()
-        val weeklyAchievementDao = database.weeklyAchievementDao()
+        val app = application as HmBuddyApplication
 
         enableEdgeToEdge()
         setContent {
@@ -47,20 +42,16 @@ class MainActivity : ComponentActivity() {
                 val currentRoute = navBackStackEntry?.destination?.route
 
                 val runViewModel: RunViewModel = viewModel(
-                    factory = RunViewModel.Factory(runDao)
+                    factory = RunViewModel.Factory(app.runLogRepository)
                 )
                 val targetViewModel: TargetViewModel = viewModel(
-                    factory = TargetViewModel.Factory(weeklyTargetDao)
+                    factory = TargetViewModel.Factory(app.weeklyTargetRepository)
                 )
                 val profileViewModel: ProfileViewModel = viewModel(
-                    factory = ProfileViewModel.Factory(userProfileDao)
+                    factory = ProfileViewModel.Factory(app.userProfileRepository)
                 )
                 val achievementViewModel: WeeklyAchievementViewModel = viewModel(
-                    factory = WeeklyAchievementViewModel.Factory(
-                        weeklyAchievementDao,
-                        runDao,
-                        weeklyTargetDao
-                    )
+                    factory = WeeklyAchievementViewModel.Factory(app.weeklyAchievementRepository)
                 )
 
                 Scaffold(
@@ -104,5 +95,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
-
