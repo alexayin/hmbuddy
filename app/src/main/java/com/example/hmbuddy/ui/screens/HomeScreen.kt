@@ -134,7 +134,7 @@ fun HomeScreen(
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "Log a Run",
+                text = "Log an activity",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold
             )
