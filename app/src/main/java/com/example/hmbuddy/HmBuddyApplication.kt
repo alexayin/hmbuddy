@@ -3,6 +3,7 @@ package com.example.hmbuddy
 import android.app.Application
 import com.example.hmbuddy.auth.AuthManager
 import com.example.hmbuddy.data.AppDatabase
+import com.example.hmbuddy.data.repository.RaceGoalRepository
 import com.example.hmbuddy.data.repository.RunLogRepository
 import com.example.hmbuddy.data.repository.UserProfileRepository
 import com.example.hmbuddy.data.repository.WeeklyAchievementRepository
@@ -41,6 +42,10 @@ class HmBuddyApplication : Application() {
             authManager,
             applicationScope
         )
+    }
+
+    val raceGoalRepository by lazy {
+        RaceGoalRepository(database.raceGoalDao())
     }
 
     val runLogRepository by lazy {

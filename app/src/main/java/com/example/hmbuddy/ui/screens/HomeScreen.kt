@@ -44,8 +44,13 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.hmbuddy.data.RaceGoal
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 import com.example.hmbuddy.data.RunType
 import com.example.hmbuddy.data.WeeklyTarget
 import com.example.hmbuddy.ui.theme.Blue500
@@ -73,6 +78,7 @@ fun HomeScreen(
     modifier: Modifier = Modifier
 ) {
     val weeklyTarget by targetViewModel.weeklyTarget.collectAsState()
+    val raceGoal by targetViewModel.raceGoal.collectAsState()
     val runsThisWeek by runViewModel.runsThisWeek.collectAsState()
     val userProfile by profileViewModel.userProfile.collectAsState()
     val currentStreak by achievementViewModel.currentStreak.collectAsState()
@@ -114,7 +120,16 @@ fun HomeScreen(
             )
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Race Countdown Card (only shown if race goal is set)
+        raceGoal?.let { goal ->
+            RaceCountdownCard(
+                raceGoal = goal,
+                onClick = onWeeklyTargetsClick
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+        }
 
         // Quick Action Button
         Button(
@@ -529,6 +544,144 @@ private fun QuickAccessCard(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun RaceCountdownCard(
+    raceGoal: RaceGoal,
+    onClick: () -> Unit
+) {
+    val daysUntilRace = ChronoUnit.DAYS.between(LocalDate.now(), raceGoal.raceDate).toInt()
+    val isRaceWeek = daysUntilRace in 0..7
+    val isPast = daysUntilRace < 0
+
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        onClick = onClick,
+        color = Color.Transparent
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    brush = Brush.linearGradient(
+                        listOf(TargetsPurple, TargetsPurple.copy(alpha = 0.8f))
+                    ),
+                    shape = RoundedCornerShape(20.dp)
+                )
+                .padding(20.dp)
+        ) {
+            Column {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Flag,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = raceGoal.raceName,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color.White
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.Bottom
+                ) {
+                    when {
+                        isPast -> {
+                            Text(
+                                text = "Race completed!",
+                                style = MaterialTheme.typography.headlineSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                        }
+                        daysUntilRace == 0 -> {
+                            Text(
+                                text = "Race Day!",
+                                style = MaterialTheme.typography.displaySmall,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                        }
+                        else -> {
+                            Text(
+                                text = "$daysUntilRace",
+                                style = MaterialTheme.typography.displayMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = if (daysUntilRace == 1) "day to go" else "days to go",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = Color.White.copy(alpha = 0.9f),
+                                modifier = Modifier.padding(bottom = 4.dp)
+                            )
+                        }
+                    }
+                }
+
+                if (isRaceWeek && !isPast && daysUntilRace > 0) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Race week!",
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = raceGoal.raceDate.format(DateTimeFormatter.ofPattern("MMM d, yyyy")),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.White.copy(alpha = 0.9f)
+                        )
+                    }
+
+                    raceGoal.targetTimeSeconds?.let { seconds ->
+                        Text(
+                            text = "Target: ${formatRaceTime(seconds)}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Medium,
+                            color = Color.White.copy(alpha = 0.9f)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+private fun formatRaceTime(totalSeconds: Int): String {
+    val hours = totalSeconds / 3600
+    val minutes = (totalSeconds % 3600) / 60
+    val seconds = totalSeconds % 60
+    return if (hours > 0) {
+        "$hours:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}"
+    } else {
+        "$minutes:${seconds.toString().padStart(2, '0')}"
     }
 }
 

@@ -7,8 +7,8 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
 @Database(
-    entities = [RunLog::class, WeeklyTarget::class, UserProfile::class, WeeklyAchievement::class],
-    version = 3,
+    entities = [RunLog::class, WeeklyTarget::class, UserProfile::class, WeeklyAchievement::class, RaceGoal::class],
+    version = 4,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -17,6 +17,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun weeklyTargetDao(): WeeklyTargetDao
     abstract fun userProfileDao(): UserProfileDao
     abstract fun weeklyAchievementDao(): WeeklyAchievementDao
+    abstract fun raceGoalDao(): RaceGoalDao
 
     companion object {
         @Volatile

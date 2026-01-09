@@ -45,7 +45,7 @@ class MainActivity : ComponentActivity() {
                     factory = RunViewModel.Factory(app.runLogRepository)
                 )
                 val targetViewModel: TargetViewModel = viewModel(
-                    factory = TargetViewModel.Factory(app.weeklyTargetRepository)
+                    factory = TargetViewModel.Factory(app.weeklyTargetRepository, app.raceGoalRepository)
                 )
                 val profileViewModel: ProfileViewModel = viewModel(
                     factory = ProfileViewModel.Factory(app.userProfileRepository)
@@ -64,7 +64,7 @@ class MainActivity : ComponentActivity() {
                                         when (currentRoute) {
                                             Screen.LogRun.route -> "Log Run"
                                             Screen.RunHistory.route -> "Run History"
-                                            Screen.WeeklyTargets.route -> "Weekly Targets"
+                                            Screen.WeeklyTargets.route -> "Targets"
                                             Screen.Profile.route -> "Profile"
                                             else -> ""
                                         }

@@ -3,16 +3,25 @@ package com.example.hmbuddy.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.hmbuddy.data.RaceGoal
 import com.example.hmbuddy.data.WeeklyTarget
+import com.example.hmbuddy.data.repository.RaceGoalRepository
 import com.example.hmbuddy.data.repository.WeeklyTargetRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
-class TargetViewModel(private val repository: WeeklyTargetRepository) : ViewModel() {
+class TargetViewModel(
+    private val weeklyTargetRepository: WeeklyTargetRepository,
+    private val raceGoalRepository: RaceGoalRepository
+) : ViewModel() {
 
-    val weeklyTarget: StateFlow<WeeklyTarget?> = repository.getWeeklyTarget()
+    val weeklyTarget: StateFlow<WeeklyTarget?> = weeklyTargetRepository.getWeeklyTarget()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    val raceGoal: StateFlow<RaceGoal?> = raceGoalRepository.getRaceGoal()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     fun saveWeeklyTarget(
@@ -26,15 +35,39 @@ class TargetViewModel(private val repository: WeeklyTargetRepository) : ViewMode
                 tempoPaceSecondsPerKm = tempoPaceSecondsPerKm,
                 weeklyDurationMinutes = weeklyDurationMinutes
             )
-            repository.saveWeeklyTarget(target)
+            weeklyTargetRepository.saveWeeklyTarget(target)
         }
     }
 
-    class Factory(private val repository: WeeklyTargetRepository) : ViewModelProvider.Factory {
+    fun saveRaceGoal(
+        raceName: String,
+        raceDate: LocalDate,
+        targetTimeSeconds: Int?
+    ) {
+        viewModelScope.launch {
+            val goal = RaceGoal(
+                raceName = raceName,
+                raceDate = raceDate,
+                targetTimeSeconds = targetTimeSeconds
+            )
+            raceGoalRepository.saveRaceGoal(goal)
+        }
+    }
+
+    fun clearRaceGoal() {
+        viewModelScope.launch {
+            raceGoalRepository.deleteRaceGoal()
+        }
+    }
+
+    class Factory(
+        private val weeklyTargetRepository: WeeklyTargetRepository,
+        private val raceGoalRepository: RaceGoalRepository
+    ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(TargetViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
-                return TargetViewModel(repository) as T
+                return TargetViewModel(weeklyTargetRepository, raceGoalRepository) as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")
         }

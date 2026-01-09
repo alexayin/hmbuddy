@@ -1,6 +1,7 @@
 package com.example.hmbuddy.data
 
 import androidx.room.TypeConverter
+import java.time.LocalDate
 
 class Converters {
     @TypeConverter
@@ -21,5 +22,15 @@ class Converters {
     @TypeConverter
     fun toGender(value: String): Gender {
         return Gender.valueOf(value)
+    }
+
+    @TypeConverter
+    fun fromLocalDate(value: LocalDate?): String? {
+        return value?.toString()
+    }
+
+    @TypeConverter
+    fun toLocalDate(value: String?): LocalDate? {
+        return value?.let { LocalDate.parse(it) }
     }
 }

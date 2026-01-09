@@ -1,8 +1,10 @@
 package com.example.hmbuddy.data
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
+import java.time.LocalDate
 
 class ConvertersTest {
 
@@ -125,5 +127,57 @@ class ConvertersTest {
             val restoredValue = converters.toGender(stringValue)
             assertEquals("Failed for $gender", gender, restoredValue)
         }
+    }
+
+    // LocalDate conversion tests
+
+    @Test
+    fun `fromLocalDate converts date to ISO string`() {
+        val date = LocalDate.of(2026, 2, 20)
+        val result = converters.fromLocalDate(date)
+        assertEquals("2026-02-20", result)
+    }
+
+    @Test
+    fun `fromLocalDate returns null for null input`() {
+        val result = converters.fromLocalDate(null)
+        assertNull(result)
+    }
+
+    @Test
+    fun `toLocalDate converts ISO string to LocalDate`() {
+        val result = converters.toLocalDate("2026-02-20")
+        assertEquals(LocalDate.of(2026, 2, 20), result)
+    }
+
+    @Test
+    fun `toLocalDate returns null for null input`() {
+        val result = converters.toLocalDate(null)
+        assertNull(result)
+    }
+
+    @Test
+    fun `LocalDate round trip conversion preserves date`() {
+        val original = LocalDate.of(2026, 6, 15)
+        val converted = converters.fromLocalDate(original)
+        val restored = converters.toLocalDate(converted)
+        assertEquals(original, restored)
+    }
+
+    @Test
+    fun `LocalDate conversion handles leap year date`() {
+        val leapYearDate = LocalDate.of(2024, 2, 29)
+        val converted = converters.fromLocalDate(leapYearDate)
+        val restored = converters.toLocalDate(converted)
+        assertEquals(leapYearDate, restored)
+    }
+
+    @Test
+    fun `LocalDate conversion handles year boundary dates`() {
+        val startOfYear = LocalDate.of(2026, 1, 1)
+        val endOfYear = LocalDate.of(2026, 12, 31)
+
+        assertEquals(startOfYear, converters.toLocalDate(converters.fromLocalDate(startOfYear)))
+        assertEquals(endOfYear, converters.toLocalDate(converters.fromLocalDate(endOfYear)))
     }
 }
