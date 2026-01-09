@@ -2,6 +2,7 @@ package com.example.hmbuddy.data.sync
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import com.example.hmbuddy.auth.AuthManager
 import com.example.hmbuddy.data.RunDao
 import com.example.hmbuddy.data.UserProfileDao
@@ -55,7 +56,7 @@ class DataMigrationManager(
             }
 
             // Mark migration as complete
-            prefs.edit().putBoolean(getMigrationKey(), true).apply()
+            prefs.edit { putBoolean(getMigrationKey(), true) }
 
         } catch (e: Exception) {
             // Log error but don't crash - migration can be retried

@@ -40,6 +40,7 @@ import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -249,7 +250,7 @@ private fun EditRunDialog(
     var paceMinutes by remember { mutableStateOf((run.paceSecondsPerKm / 60).toString()) }
     var paceSeconds by remember { mutableStateOf((run.paceSecondsPerKm % 60).toString().padStart(2, '0')) }
     var selectedRunType by remember { mutableStateOf(run.runType) }
-    var selectedDate by remember { mutableStateOf(run.date) }
+    var selectedDate by remember { mutableLongStateOf(run.date) }
     var showDatePicker by remember { mutableStateOf(false) }
 
     val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
