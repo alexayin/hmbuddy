@@ -87,6 +87,9 @@ class HmBuddyApplication : Application() {
         applicationScope.launch {
             try {
                 authManager.ensureAuthenticated()
+                // First try to restore from Firestore if local DB is empty
+                migrationManager.restoreIfLocalDatabaseEmpty()
+                // Then perform migration if needed (uploads local to Firestore)
                 migrationManager.performMigrationIfNeeded()
             } catch (e: Exception) {
                 e.printStackTrace()
