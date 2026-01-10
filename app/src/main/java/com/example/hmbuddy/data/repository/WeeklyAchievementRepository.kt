@@ -40,6 +40,9 @@ class WeeklyAchievementRepository(
     suspend fun getTotalMinutesForWeek(weekStart: Long, weekEnd: Long): Int =
         runDao.getTotalMinutesForWeek(weekStart, weekEnd)
 
+    fun getTotalMinutesFlowForWeek(weekStart: Long): Flow<Int> =
+        runDao.getTotalMinutesFlowForWeek(weekStart)
+
     fun getWeeklyTarget(): Flow<com.example.hmbuddy.data.WeeklyTarget?> =
         targetDao.getWeeklyTarget()
 

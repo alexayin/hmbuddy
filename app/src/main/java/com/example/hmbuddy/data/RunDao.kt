@@ -26,4 +26,7 @@ interface RunDao {
 
     @Query("SELECT COALESCE(SUM(durationMinutes), 0) FROM run_logs WHERE date >= :weekStart AND date < :weekEnd")
     suspend fun getTotalMinutesForWeek(weekStart: Long, weekEnd: Long): Int
+
+    @Query("SELECT COALESCE(SUM(durationMinutes), 0) FROM run_logs WHERE date >= :weekStart")
+    fun getTotalMinutesFlowForWeek(weekStart: Long): Flow<Int>
 }

@@ -22,16 +22,37 @@ class WeeklyAchievementViewModel(
     private val _achievements = MutableStateFlow<List<WeeklyAchievement>>(emptyList())
     val achievements: StateFlow<List<WeeklyAchievement>> = _achievements
 
+    private val _currentWeekAchieved = MutableStateFlow(false)
+
     init {
         loadAchievements()
         checkAndRecordPreviousWeek()
+        loadCurrentWeekStatus()
     }
 
     private fun loadAchievements() {
         viewModelScope.launch {
             repository.getAllAchievements().collect { achievementList ->
                 _achievements.value = achievementList
-                _currentStreak.value = calculateStreak(achievementList)
+                _currentStreak.value = calculateStreak(achievementList, _currentWeekAchieved.value)
+            }
+        }
+    }
+
+    private fun loadCurrentWeekStatus() {
+        viewModelScope.launch {
+            val currentWeekStart = DateUtils.getStartOfWeekTimestamp()
+            val weeklyTarget = repository.getWeeklyTarget().first()
+
+            if (weeklyTarget == null) {
+                _currentWeekAchieved.value = false
+                return@launch
+            }
+
+            repository.getTotalMinutesFlowForWeek(currentWeekStart).collect { totalMinutes ->
+                val achieved = totalMinutes >= weeklyTarget.weeklyDurationMinutes
+                _currentWeekAchieved.value = achieved
+                _currentStreak.value = calculateStreak(_achievements.value, achieved)
             }
         }
     }
@@ -63,19 +84,23 @@ class WeeklyAchievementViewModel(
         }
     }
 
-    private fun calculateStreak(achievements: List<WeeklyAchievement>): Int {
+    private fun calculateStreak(
+        achievements: List<WeeklyAchievement>,
+        currentWeekAchieved: Boolean
+    ): Int {
         val currentWeekStart = DateUtils.getStartOfWeekTimestamp()
+        val previousWeekStart = DateUtils.getStartOfPreviousWeekTimestamp()
 
         val pastWeekAchievements = achievements.filter {
             it.weekStartTimestamp < currentWeekStart
         }
 
-        var streak = 0
-        var expectedWeekStart = DateUtils.getStartOfPreviousWeekTimestamp()
+        var pastStreak = 0
+        var expectedWeekStart = previousWeekStart
 
         for (achievement in pastWeekAchievements) {
             if (achievement.weekStartTimestamp == expectedWeekStart && achievement.goalAchieved) {
-                streak++
+                pastStreak++
                 val calendar = Calendar.getInstance()
                 calendar.timeInMillis = expectedWeekStart
                 calendar.add(Calendar.WEEK_OF_YEAR, -1)
@@ -85,7 +110,23 @@ class WeeklyAchievementViewModel(
             }
         }
 
-        return streak
+        // Include current week if goal achieved AND streak is unbroken
+        if (currentWeekAchieved) {
+            val lastWeekRecord = pastWeekAchievements.find {
+                it.weekStartTimestamp == previousWeekStart
+            }
+            // A week with 0 minutes means the user wasn't active - don't count as breaking streak
+            val lastWeekBrokeStreak = lastWeekRecord != null &&
+                lastWeekRecord.actualMinutes > 0 &&
+                !lastWeekRecord.goalAchieved
+            val noPastActiveWeeks = pastWeekAchievements.none { it.actualMinutes > 0 }
+
+            if (noPastActiveWeeks || !lastWeekBrokeStreak) {
+                return pastStreak + 1
+            }
+        }
+
+        return pastStreak
     }
 
     class Factory(
