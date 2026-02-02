@@ -73,6 +73,8 @@ class FirestoreDataSource(
             zone2PaceSecondsPerKm = target.zone2PaceSecondsPerKm,
             tempoPaceSecondsPerKm = target.tempoPaceSecondsPerKm,
             weeklyDurationMinutes = target.weeklyDurationMinutes,
+            zone2Note = target.zone2Note,
+            tempoNote = target.tempoNote,
             updatedAt = Timestamp.now()
         )
         userDocument().collection("targets").document("current")
@@ -91,7 +93,9 @@ class FirestoreDataSource(
                     WeeklyTarget(
                         zone2PaceSecondsPerKm = it.zone2PaceSecondsPerKm,
                         tempoPaceSecondsPerKm = it.tempoPaceSecondsPerKm,
-                        weeklyDurationMinutes = it.weeklyDurationMinutes
+                        weeklyDurationMinutes = it.weeklyDurationMinutes,
+                        zone2Note = it.zone2Note,
+                        tempoNote = it.tempoNote
                     )
                 }
                 trySend(target)
@@ -105,7 +109,9 @@ class FirestoreDataSource(
         return WeeklyTarget(
             zone2PaceSecondsPerKm = doc.zone2PaceSecondsPerKm,
             tempoPaceSecondsPerKm = doc.tempoPaceSecondsPerKm,
-            weeklyDurationMinutes = doc.weeklyDurationMinutes
+            weeklyDurationMinutes = doc.weeklyDurationMinutes,
+            zone2Note = doc.zone2Note,
+            tempoNote = doc.tempoNote
         )
     }
 

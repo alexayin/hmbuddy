@@ -54,6 +54,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.hmbuddy.data.RaceGoal
 import com.example.hmbuddy.ui.theme.TargetsPurple
+import com.example.hmbuddy.util.FormatUtils
 import com.example.hmbuddy.viewmodel.TargetViewModel
 import java.time.Instant
 import java.time.LocalDate
@@ -72,8 +73,10 @@ fun WeeklyTargetsScreen(
 
     var zone2Minutes by remember { mutableStateOf("") }
     var zone2Seconds by remember { mutableStateOf("") }
+    var zone2Note by remember { mutableStateOf("") }
     var tempoMinutes by remember { mutableStateOf("") }
     var tempoSeconds by remember { mutableStateOf("") }
+    var tempoNote by remember { mutableStateOf("") }
     var weeklyDuration by remember { mutableStateOf("") }
 
     // Race goal state
@@ -91,11 +94,13 @@ fun WeeklyTargetsScreen(
             val z2Secs = target.zone2PaceSecondsPerKm % 60
             zone2Minutes = z2Mins.toString()
             zone2Seconds = z2Secs.toString().padStart(2, '0')
+            zone2Note = target.zone2Note
 
             val tMins = target.tempoPaceSecondsPerKm / 60
             val tSecs = target.tempoPaceSecondsPerKm % 60
             tempoMinutes = tMins.toString()
             tempoSeconds = tSecs.toString().padStart(2, '0')
+            tempoNote = target.tempoNote
 
             weeklyDuration = target.weeklyDurationMinutes.toString()
         }
@@ -255,6 +260,18 @@ fun WeeklyTargetsScreen(
                     onSecondsChange = { zone2Seconds = it }
                 )
 
+                Spacer(modifier = Modifier.height(8.dp))
+
+                OutlinedTextField(
+                    value = zone2Note,
+                    onValueChange = { zone2Note = it },
+                    label = { Text("Zone 2 Note") },
+                    placeholder = { Text("e.g., Keep heart rate below 150 bpm") },
+                    modifier = Modifier.fillMaxWidth(),
+                    minLines = 2,
+                    maxLines = 4
+                )
+
                 Spacer(modifier = Modifier.height(20.dp))
 
                 Text(
@@ -269,6 +286,18 @@ fun WeeklyTargetsScreen(
                     seconds = tempoSeconds,
                     onMinutesChange = { tempoMinutes = it },
                     onSecondsChange = { tempoSeconds = it }
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                OutlinedTextField(
+                    value = tempoNote,
+                    onValueChange = { tempoNote = it },
+                    label = { Text("Tempo Note") },
+                    placeholder = { Text("e.g., Focus on consistent splits") },
+                    modifier = Modifier.fillMaxWidth(),
+                    minLines = 2,
+                    maxLines = 4
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -292,7 +321,7 @@ fun WeeklyTargetsScreen(
                 val duration = weeklyDuration.toIntOrNull() ?: 0
 
                 if (z2PaceSecs > 0 && tempoPaceSecs > 0 && duration > 0) {
-                    targetViewModel.saveWeeklyTarget(z2PaceSecs, tempoPaceSecs, duration)
+                    targetViewModel.saveWeeklyTarget(z2PaceSecs, tempoPaceSecs, duration, zone2Note, tempoNote)
                     onTargetsSaved()
                 }
             },
@@ -374,7 +403,7 @@ private fun RaceGoalCard(
                     raceGoal.targetTimeSeconds?.let { seconds ->
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = "Target: ${formatRaceTime(seconds)}",
+                            text = "Target: ${FormatUtils.formatRaceTime(seconds)}",
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Medium,
                             color = TargetsPurple
@@ -588,16 +617,5 @@ private fun PaceInput(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             modifier = Modifier.weight(1f)
         )
-    }
-}
-
-private fun formatRaceTime(totalSeconds: Int): String {
-    val hours = totalSeconds / 3600
-    val minutes = (totalSeconds % 3600) / 60
-    val seconds = totalSeconds % 60
-    return if (hours > 0) {
-        "$hours:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}"
-    } else {
-        "$minutes:${seconds.toString().padStart(2, '0')}"
     }
 }

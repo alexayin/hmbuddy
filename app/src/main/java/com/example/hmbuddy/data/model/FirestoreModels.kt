@@ -13,6 +13,8 @@ data class WeeklyTargetDocument(
     val zone2PaceSecondsPerKm: Int = 0,
     val tempoPaceSecondsPerKm: Int = 0,
     val weeklyDurationMinutes: Int = 0,
+    val zone2Note: String = "",
+    val tempoNote: String = "",
     val updatedAt: Timestamp = Timestamp.now()
 )
 

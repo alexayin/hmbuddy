@@ -27,13 +27,17 @@ class TargetViewModel(
     fun saveWeeklyTarget(
         zone2PaceSecondsPerKm: Int,
         tempoPaceSecondsPerKm: Int,
-        weeklyDurationMinutes: Int
+        weeklyDurationMinutes: Int,
+        zone2Note: String = "",
+        tempoNote: String = ""
     ) {
         viewModelScope.launch {
             val target = WeeklyTarget(
                 zone2PaceSecondsPerKm = zone2PaceSecondsPerKm,
                 tempoPaceSecondsPerKm = tempoPaceSecondsPerKm,
-                weeklyDurationMinutes = weeklyDurationMinutes
+                weeklyDurationMinutes = weeklyDurationMinutes,
+                zone2Note = zone2Note,
+                tempoNote = tempoNote
             )
             weeklyTargetRepository.saveWeeklyTarget(target)
         }
