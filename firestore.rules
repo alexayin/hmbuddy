@@ -1,0 +1,45 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Deny all access by default
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // User-specific data rules
+    match /users/{userId} {
+
+      // Only authenticated users can access their own data
+      function isOwner() {
+        return request.auth != null && request.auth.uid == userId;
+      }
+
+      // Profile subcollection - single "current" document
+      match /profile/{docId} {
+        allow read: if isOwner();
+        allow write: if isOwner();
+      }
+
+      // Targets subcollection - single "current" document
+      match /targets/{docId} {
+        allow read: if isOwner();
+        allow write: if isOwner();
+      }
+
+      // Run logs subcollection - multiple documents
+      match /runLogs/{logId} {
+        allow read: if isOwner();
+        allow write: if isOwner();
+        allow delete: if isOwner();
+      }
+
+      // Achievements subcollection - multiple documents
+      match /achievements/{achievementId} {
+        allow read: if isOwner();
+        allow write: if isOwner();
+      }
+    }
+  }
+}
