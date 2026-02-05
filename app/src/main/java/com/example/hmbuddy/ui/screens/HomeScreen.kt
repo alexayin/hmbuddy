@@ -60,6 +60,7 @@ import com.example.hmbuddy.ui.theme.OrangeAccent
 import com.example.hmbuddy.ui.theme.TargetsPurple
 import com.example.hmbuddy.ui.theme.Teal500
 import com.example.hmbuddy.ui.theme.Teal600
+import com.example.hmbuddy.util.FormatUtils
 import com.example.hmbuddy.viewmodel.ProfileViewModel
 import com.example.hmbuddy.viewmodel.RunViewModel
 import com.example.hmbuddy.viewmodel.TargetViewModel
@@ -493,7 +494,7 @@ private fun StatCard(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
-                            text = formatPace(targetPace),
+                            text = FormatUtils.formatPace(targetPace),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold,
                             color = iconColor
@@ -662,7 +663,7 @@ private fun RaceCountdownCard(
 
                     raceGoal.targetTimeSeconds?.let { seconds ->
                         Text(
-                            text = "Target: ${formatRaceTime(seconds)}",
+                            text = "Target: ${FormatUtils.formatRaceTime(seconds)}",
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Medium,
                             color = Color.White.copy(alpha = 0.9f)
@@ -672,21 +673,4 @@ private fun RaceCountdownCard(
             }
         }
     }
-}
-
-private fun formatRaceTime(totalSeconds: Int): String {
-    val hours = totalSeconds / 3600
-    val minutes = (totalSeconds % 3600) / 60
-    val seconds = totalSeconds % 60
-    return if (hours > 0) {
-        "$hours:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}"
-    } else {
-        "$minutes:${seconds.toString().padStart(2, '0')}"
-    }
-}
-
-fun formatPace(secondsPerKm: Int): String {
-    val minutes = secondsPerKm / 60
-    val seconds = secondsPerKm % 60
-    return "$minutes:${seconds.toString().padStart(2, '0')} /km"
 }

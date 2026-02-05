@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.util.Log
 import androidx.core.content.edit
 import com.example.hmbuddy.auth.AuthManager
+import com.example.hmbuddy.data.RaceGoalDao
 import com.example.hmbuddy.data.RunDao
 import com.example.hmbuddy.data.UserProfileDao
 import com.example.hmbuddy.data.WeeklyAchievementDao
@@ -18,7 +19,8 @@ class DataMigrationManager(
     private val runDao: RunDao,
     private val userProfileDao: UserProfileDao,
     private val weeklyTargetDao: WeeklyTargetDao,
-    private val weeklyAchievementDao: WeeklyAchievementDao
+    private val weeklyAchievementDao: WeeklyAchievementDao,
+    private val raceGoalDao: RaceGoalDao
 ) {
     private val prefs: SharedPreferences =
         context.getSharedPreferences("hmbuddy_migration", Context.MODE_PRIVATE)
@@ -61,6 +63,11 @@ class DataMigrationManager(
             // Migrate all WeeklyAchievements
             weeklyAchievementDao.getAllAchievements().first().forEach { achievement ->
                 firestoreDataSource.saveWeeklyAchievement(achievement)
+            }
+
+            // Migrate RaceGoal
+            raceGoalDao.getRaceGoal().first()?.let { raceGoal ->
+                firestoreDataSource.saveRaceGoal(raceGoal)
             }
 
             // Mark migration as complete
@@ -111,6 +118,12 @@ class DataMigrationManager(
             }
             Log.d("DataMigrationManager", "Restored ${achievements.size} achievements")
 
+            // Restore RaceGoal
+            firestoreDataSource.getRaceGoal()?.let { raceGoal ->
+                raceGoalDao.insertRaceGoal(raceGoal)
+                Log.d("DataMigrationManager", "Restored race goal: ${raceGoal.raceName}")
+            }
+
             // Mark restore as complete
             prefs.edit { putBoolean(getRestoreKey(), true) }
             Log.d("DataMigrationManager", "Restore from Firestore completed successfully")
@@ -130,7 +143,8 @@ class DataMigrationManager(
         try {
             val hasLocalData = runDao.getAllRuns().first().isNotEmpty() ||
                     userProfileDao.getUserProfile().first() != null ||
-                    weeklyTargetDao.getWeeklyTarget().first() != null
+                    weeklyTargetDao.getWeeklyTarget().first() != null ||
+                    raceGoalDao.getRaceGoal().first() != null
 
             if (!hasLocalData) {
                 Log.d("DataMigrationManager", "Local database is empty, attempting restore from Firestore")

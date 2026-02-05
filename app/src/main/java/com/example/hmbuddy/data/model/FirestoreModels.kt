@@ -35,3 +35,10 @@ data class WeeklyAchievementDocument(
     val goalAchieved: Boolean = false,
     val recordedAt: Long = 0
 )
+
+data class RaceGoalDocument(
+    val raceName: String = "",
+    val raceDate: String = "", // ISO format e.g. "2026-03-15"
+    val targetTimeSeconds: Int? = null,
+    val updatedAt: Timestamp = Timestamp.now()
+)

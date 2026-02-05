@@ -45,7 +45,12 @@ class HmBuddyApplication : Application() {
     }
 
     val raceGoalRepository by lazy {
-        RaceGoalRepository(database.raceGoalDao())
+        RaceGoalRepository(
+            database.raceGoalDao(),
+            firestoreDataSource,
+            authManager,
+            applicationScope
+        )
     }
 
     val runLogRepository by lazy {
@@ -76,7 +81,8 @@ class HmBuddyApplication : Application() {
             database.runDao(),
             database.userProfileDao(),
             database.weeklyTargetDao(),
-            database.weeklyAchievementDao()
+            database.weeklyAchievementDao(),
+            database.raceGoalDao()
         )
     }
 

@@ -55,6 +55,7 @@ import com.example.hmbuddy.data.RunLog
 import com.example.hmbuddy.data.RunType
 import com.example.hmbuddy.ui.theme.Blue500
 import com.example.hmbuddy.ui.theme.Orange500
+import com.example.hmbuddy.util.FormatUtils
 import com.example.hmbuddy.viewmodel.RunViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -210,7 +211,7 @@ private fun RunCard(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
-                            text = formatPace(run.paceSecondsPerKm),
+                            text = FormatUtils.formatPace(run.paceSecondsPerKm),
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Medium,
                             color = MaterialTheme.colorScheme.onSurface

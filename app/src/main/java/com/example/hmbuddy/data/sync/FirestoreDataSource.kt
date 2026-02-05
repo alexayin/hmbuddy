@@ -7,10 +7,13 @@ import com.example.hmbuddy.data.RunType
 import com.example.hmbuddy.data.UserProfile
 import com.example.hmbuddy.data.WeeklyAchievement
 import com.example.hmbuddy.data.WeeklyTarget
+import com.example.hmbuddy.data.RaceGoal
+import com.example.hmbuddy.data.model.RaceGoalDocument
 import com.example.hmbuddy.data.model.RunLogDocument
 import com.example.hmbuddy.data.model.UserProfileDocument
 import com.example.hmbuddy.data.model.WeeklyAchievementDocument
 import com.example.hmbuddy.data.model.WeeklyTargetDocument
+import java.time.LocalDate
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
@@ -216,5 +219,32 @@ class FirestoreDataSource(
                 trySend(achievements)
             }
         awaitClose { listener.remove() }
+    }
+
+    // RaceGoal operations
+    suspend fun saveRaceGoal(raceGoal: RaceGoal) {
+        val doc = RaceGoalDocument(
+            raceName = raceGoal.raceName,
+            raceDate = raceGoal.raceDate.toString(),
+            targetTimeSeconds = raceGoal.targetTimeSeconds,
+            updatedAt = Timestamp.now()
+        )
+        userDocument().collection("raceGoal").document("current")
+            .set(doc, SetOptions.merge()).await()
+    }
+
+    suspend fun getRaceGoal(): RaceGoal? {
+        val snapshot = userDocument().collection("raceGoal").document("current").get().await()
+        val doc = snapshot.toObject(RaceGoalDocument::class.java) ?: return null
+        if (doc.raceName.isEmpty()) return null
+        return RaceGoal(
+            raceName = doc.raceName,
+            raceDate = LocalDate.parse(doc.raceDate),
+            targetTimeSeconds = doc.targetTimeSeconds
+        )
+    }
+
+    suspend fun deleteRaceGoal() {
+        userDocument().collection("raceGoal").document("current").delete().await()
     }
 }

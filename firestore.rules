@@ -40,6 +40,12 @@ service cloud.firestore {
         allow read: if isOwner();
         allow write: if isOwner();
       }
+
+      // Race goal subcollection - single "current" document
+      match /raceGoal/{docId} {
+        allow read: if isOwner();
+        allow write: if isOwner();
+      }
     }
   }
 }
